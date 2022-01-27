@@ -1,0 +1,36 @@
+https://www.highvoltagecode.com/post/edge-ai-semantic-segmentation-on-nvidia-jetson
+
+git clone https://github.com/Onixaz/pytorch-segmentation
+
+cd pytorch-segmentation
+conda create -n segmentation --file requirements.txt
+
+conda activate segmentation
+
+conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=10.0 -c pytorch
+
+conda install pycocotools
+
+conda install -c conda-forge onnx
+
+pip install pyqt5 labelme
+
+python labelme2voc.py ~/training_data/labeled/train ~/training_data/voc/train --labels ~/training_data/labels.txt
+python labelme2voc.py ~/training_data/labeled/test ~/training_data/voc/test --labels ~/training_data/labels.txt
+
+python setup_custom.py -t ~/training_data/voc/train -v ~/training_data/voc/test -o ~/training_data/dataset
+
+python train.py ~/training_data/dataset --dataset=custom --model-dir ~/training_data/model --classes 5 --arch fcn_resnet18
+
+python onnx_export.py --model-dir ~/training_data/model
+
+gsutil -m cp -r ~/training_data/model/model_best.pth gs://reckonpoint-objects/semantic-segmentation/20220126/
+gsutil -m cp -r ~/training_data/model/fcn_resnet18.onnx gs://reckonpoint-objects/semantic-segmentation/20220126/
+
+
+global correct: 90.1
+average row correct: ['79.4', '88.8', '98.1', '93.8', '21.3']
+IoU: ['74.5', '82.2', '84.8', '87.3', '15.0']
+mean IoU: 68.8
+saved checkpoint to:  /home/jeff/training_data/model/model_29.pth  (68.775% mean IoU, 90.131% accuracy)
+Training time 0:06:47

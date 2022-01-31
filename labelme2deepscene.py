@@ -7,22 +7,38 @@ import glob
 import os
 import os.path as osp
 import sys
+import pprint
 
-import imgviz
+from PIL import Image
 import numpy as np
 
 import labelme
 
-CLASS_MAP = {
-    'background': 0, #black
-    'obstacle': 1, #maroon
-    'grass': 2, #green
-    'vegetation': 3, #olive
-    'sky': 4, #navy
-    'water': 6, #teal
-    'road': 7, #grey
-    'trail': 8, #brown
+import color_palette
+
+DEEPSCENE_LABELS = {
+    'background': 0, #ivory
+    'void': 1, #black
+    'trail': 2, #sienna
+    'grass': 3, #green
+    'vegetation': 4, #olive
+    'obstacle': 5, #red
+    'sky': 6, #blue
+    'water': 7, #aqua
+    'road': 8, #grey
 }
+
+def lblsave(filename, lbl):
+    
+    if osp.splitext(filename)[1] != ".png":
+        filename += ".png"
+
+    palette = color_palette.get_label_palette()
+
+    lbl_pil = Image.fromarray(lbl.astype(np.uint8), mode="P")
+    lbl_pil.putpalette(palette)
+    lbl_pil.save(filename)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -45,29 +61,34 @@ def main():
 
     print("Creating dataset:", args.output_dir)
 
-    class_map_max_value =  max(CLASS_MAP.values())
-    class_names = ['background']
-    class_name_to_id = {'background': 0}
-    next_class_id = 5
+    class_names = []
+    class_name_to_id = {}
+
+    for i, name in enumerate(DEEPSCENE_LABELS):
+        class_names.append(name)
+        class_name_to_id[name] = i
+
+    next_class_id = max(class_name_to_id.values()) + 1
 
     with open(args.labels, 'r') as f:
-        for i, line in enumerate(f.readlines()):
-            while next_class_id in CLASS_MAP.values() or next_class_id in class_name_to_id.values():
+        for line in f.readlines():
+            while next_class_id in class_name_to_id.values():
                 next_class_id += 1
             label = line.strip()
             if label in class_names:
                 continue
             class_names.append(label)
-            class_name_to_id[label] = CLASS_MAP[label] if label in CLASS_MAP else next_class_id
+            class_name_to_id[label] = next_class_id
 
     class_names = tuple(class_names)
     print("class_names: ", class_names)
     print('classes: ', class_name_to_id)
 
-    out_class_names_file = osp.join(args.output_dir, "class_names.txt")
-    with open(out_class_names_file, "w") as f:
+    with open(osp.join(args.output_dir, "class_names.txt"), "w") as f:
         f.writelines("\n".join(class_names))
-    print("Saved class_names:", out_class_names_file)
+
+    with open(osp.join(args.output_dir, "classes.txt"), "w") as f:
+        pprint.pprint(class_name_to_id, f)
 
     for filename in glob.glob(osp.join(args.input_dir, "*.json")):
         print("Generating dataset from:", filename)
@@ -89,7 +110,7 @@ def main():
             shapes=label_file.shapes,
             label_name_to_value=class_name_to_id,
         )
-        labelme.utils.lblsave(out_png_file, lbl)
+        lblsave(out_png_file, lbl)
 
 
 if __name__ == "__main__":

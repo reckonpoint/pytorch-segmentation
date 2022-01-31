@@ -91,7 +91,7 @@ def get_dataset(name, path, image_set, transform, num_classes):
         "voc_aug": (path, sbd, num_classes),
         "coco": (path, get_coco, num_classes),
         "cityscapes": (path, get_cityscapes, num_classes),
-        "deepscene": (path, DeepSceneSegmentation, 5),
+        "deepscene": (path, DeepSceneSegmentation, num_classes),
         "mhp": (path, MHPSegmentation, num_classes),
         "nyu": (path, NYUDepth, num_classes),
         "sun": (path, SunRGBDSegmentation, num_classes),

@@ -33,7 +33,7 @@ class DeepSceneSegmentation(Dataset):
 			self.images.extend(train_images)
 			self.targets.extend(train_targets)
 
-			if os.path.isdir(os.path.join(root_dir, 'trainextra/rgb') and os.path.isdir(os.path.join(root_dir, 'trainextra/GT_index')):			
+			if os.path.isdir(os.path.join(root_dir, 'trainextra/rgb')) and os.path.isdir(os.path.join(root_dir, 'trainextra/GT_index')):			
 				extra_images, extra_targets = self.gather_images(os.path.join(root_dir, 'trainextra/rgb'),
 											         	    os.path.join(root_dir, 'trainextra/GT_index'))
 
@@ -47,7 +47,7 @@ class DeepSceneSegmentation(Dataset):
 			self.images.extend(val_images)
 			self.targets.extend(val_targets)
 
-			if os.path.isdir(os.path.join(root_dir, 'testextra/rgb') and os.path.isdir(os.path.join(root_dir, 'testextra/GT_index')):			
+			if os.path.isdir(os.path.join(root_dir, 'testextra/rgb')) and os.path.isdir(os.path.join(root_dir, 'testextra/GT_index')):			
 				extra_images, extra_targets = self.gather_images(os.path.join(root_dir, 'trainextra/rgb'),
 											         	    os.path.join(root_dir, 'trainextra/GT_index'))
 

@@ -25,13 +25,15 @@ import color_palette
 # 		    (2, 'void', (0, 60, 0)) ]	# 'void' appears to be trees in the dataset, so it is mapped to vegetation
 
 CLASS_MAP = {
-	(170, 170, 170): (2, 0, 'trail'),
-	(0, 255, 0): (3, 1, 'grass'),
-	(102, 102, 51): (4, 2, 'vegetation'),
-	(0, 60, 0): (4, 2, 'void'),
-	(0, 0, 0): (5, 3, 'obstacle'),
-	(0, 120, 255): (6, 4, 'sky')
+	(170, 170, 170): (1, 0, 'trail'),
+	(0, 255, 0): (2, 1, 'grass'),
+	(102, 102, 51): (3, 2, 'vegetation'),
+	(0, 60, 0): (3, 2, 'void'),
+	(0, 0, 0): (4, 3, 'obstacle'),
+	(0, 120, 255): (5, 4, 'sky')
 }
+
+PALETTE = color_palette.get_palette_as_array().flatten()
 
 def lookup_class(color):
 	for c in CLASS_MAP:
@@ -67,7 +69,7 @@ def remap_labels(args):
 			img_output.putpixel((x,y), new_label)
 	
 	if colorized:
-		img_output.putpalette(color_palette.get_label_palette())
+		img_output.putpalette(PALETTE)
 	img_output.save(output_path)
 
 
